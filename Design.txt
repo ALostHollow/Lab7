@@ -1,0 +1,47 @@
+SSTE module: Planning done by Rowan
+Requirements:
+keep track of upto 500 outstanding orders and upto 100 clients. Whenever a new order is added
+check the global array of orders for a matching one. Validate all new orders with the client's
+balance and number of shares. Validate orders again before processing incase two orders where 
+placed and the account balance has since changed.
+
+The orders and clients will be stored in global arrays. To mark a struct in the array as 
+'empty' or unused we'll set the id to 0, for both orders and clients. This way the functions
+will require less paramaters to be passed and we dont need to shift elements in the array
+when deleting or adding elements.
+
+Functions:
+initialize - sets the ids of each client in the global client array to 0. an id of 0 represents
+an empty or free index in the array. Does the same with the global order array, with the same
+principal of 0 representing an unused index or order struct in the array. Implemented by Rowan
+
+addClient - pass a name, account balance, and number of shares and this will update the first
+'empty' index in the client array to represent the new client. Implemented by Rowan
+
+removeClient - pass a client id and it will set the id of the client to 0, marking it as 
+'empty', also remove all orders from that client from the global order array.
+
+printClients - iterates through the global client array and prints each one along with their
+balance, shares, and id. Implemented by Rowan
+
+placeOrder - pass a number of shares, the price, the id of the client the order is for, and the
+order type, either 0 or 1 for buy or sell respectively, and this will add the order to the
+global order array at the first 'empty' index. Validate the order before placing it.
+
+printOrders - iterates through the global order array and print each order, including the
+client id, price, type, and amount of shares.
+
+compareOrders - pass two orders, it will return a 0 if they are a match, fit for processing, or
+a 0 if they dont match, the prices or share counts dont work.
+
+completeOrder - pass two orders, assumed that they match, and it will update the two client's
+account balance, share count, and remove the two orders from the global order array.
+
+
+UI module: Planning done by ...
+Requirements:
+allow users to:
+	add/remove clients
+	add/remove orders
+	print all orders in the global array
+	print all clients in the global array
