@@ -7,7 +7,8 @@ typedef struct order_
     unsigned int number;
     float price;
     unsigned int type; // 0 for buy, 1 for sell
-    struct client_ *client;
+    //struct client_ *client;
+    unsigned int client_id;
     unsigned int order_id;
 } order;
 
@@ -40,7 +41,7 @@ struct order_ ORDERS[500];
 void initialize(void); // Done
 // adds ids of 0 to each element in the global arrays
 
-void addClient(unsigned char *name, float balance, unsigned int shares); // Done
+unsigned int addClient(unsigned char *name, float balance, unsigned int shares); // Done
 // adds a new client, if there are less than 100 already present.
 
 void removeClient(unsigned int client_id);
@@ -50,16 +51,15 @@ void removeClient(unsigned int client_id);
 void printClients(void); // Done
 // prints the clients currently in the global array of clients
 
-void placeOrder(unsigned int num, float price, unsigned int client_id, unsigned int type);
+int placeOrder(unsigned int num, float price, unsigned int client_id, unsigned int type); // Done
 // validates the order: checks client for enough money/shares for buy and sell respectively
 // checks checks each
 
 void printOrders(void);
 // prints the outstanding orders in the global array of orders
 
-int compareOrders(order A, order B);
+int compareOrders(order A, order B); // Done
 // a comparision function for orders, returns a 0 if compatable or a 1 if not compatable.
 
-void completeOrder(order A, order B);
-// updates the account balance and shares of each client and removes the orders from the
-// global array of orders
+int processOrders(unsigned int order_id); // Done
+// takes an order'is id and compares it against all other orders, processing them if they match

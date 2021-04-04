@@ -40,7 +40,7 @@ Parameters:
 Returns:
     none
 */
-void addClient(unsigned char *name, float balance, unsigned int shares)
+unsigned int addClient(unsigned char *name, float balance, unsigned int shares)
 {
     int i;
     for (i = 0; i < 100; i++)
@@ -52,10 +52,10 @@ void addClient(unsigned char *name, float balance, unsigned int shares)
             CLIENTS[i].balance = balance;
             CLIENTS[i].shares = shares;
             printf("client added\n");
-            return;
+            return i + 1;
         }
     }
-    return;
+    return 0;
 }
 
 void removeClient(unsigned int client_id)
@@ -87,45 +87,100 @@ void printClients(void)
     }
     return;
 }
-//for Type: 0 buy, 1 for sell
-void placeOrder(unsigned int num, float price, unsigned int client_id, unsigned int type)
+/*
+placeOrder(num, price, client_id, type)
+This function takes a number of shares, the id of the client who is placing the
+order, and the type of order (0 - buy, 1 - sell). It will call 'processOrders()'
+to process any new matching orders, after adding the new order.
+Pre Conditions:
+    initialize must have been run at least once.
+Post Conditions:
+    the new order was placed, and porcessed if a matching order existed.
+Parameters:
+    num: the number of shares to be sold/bought
+    price: the price per share
+    client_id: the id of an order to be checked against the rest
+    type: 0 or 1 for buy or sell
+Returns:
+    0 or 1: regular and failed exit case
+*/
+int placeOrder(unsigned int num, float price, unsigned int client_id, unsigned int type)
 {
     //Making sure that the clients balance is > than the price of the stock he wants to purcase
     //If not, we do a succesful exist.
-    int total_stock_amount = num * price;
-    if (CLIENTS[client_id].balance < total_stock_amount)
-    {
-        printf("Insufficent Funds!\n");
-        return 0;
-    }
-
-    for (int i = 0; i < 500; i++)
-    {
-        //So here, type 0 means we are buying a stock and we are making sure the id == 0 so there is a spot to be used.
-        if (ORDERS[i].order_id == 0 && type == 0)
-        {
-            //I feel like this isn't correct as we'd have to associate it to the CLIENT ID as well but will ask members in group
-            //Not sure how to store client_ID
-            ORDERS[i].client->client_id = client_id;
-            ORDERS[i].number = num;
-            ORDERS[i].price = price;
-            ORDERS[i].type = 0;
-            //Have to set order_id to something
-            return 0;
-        }
-        //So here, we are selling the stock, only thing that need sto change is the type.
-        //Once we have found a spot, we simply exit the program.
-
-        else
-        {
-            ORDERS[i].client->client_id = client_id;
-            ORDERS[i].number = num;
-            ORDERS[i].price = price;
-            ORDERS[i].type = 1;
-            //Have to set order_id to something
-            return 0;
+    float total_stock_amount = (float)num * price;
+    int i;
+    printf("[DEBUG] Total Price: %.2f\n", total_stock_amount);
+    if (type == 0 && total_stock_amount <= CLIENTS[client_id - 1].balance) {
+        for (i = 0; i < 500; i++) {
+            if (ORDERS[i].order_id == 0) {
+                ORDERS[i].client_id = client_id;
+                ORDERS[i].number = num;
+                ORDERS[i].price = price;
+                ORDERS[i].type = 0;
+                ORDERS[i].order_id = i + 1;
+                return processOrders(i + 1);
+            }
         }
     }
+    else if (type == 1 && num <= CLIENTS[client_id - 1].shares) {
+        for (i = 0; i < 500; i++) {
+            if (ORDERS[i].order_id == 0) {
+                ORDERS[i].client_id = client_id;
+                ORDERS[i].number = num;
+                ORDERS[i].price = price;
+                ORDERS[i].type = 1;
+                ORDERS[i].order_id = i + 1;
+                return processOrders(i + 1);
+            }
+        }
+    }
+    else {
+        printf("[DEBUG] failed to place order\n");
+        return 1;
+    }
+}
+
+/*
+processOrders(order_id)
+This function takes the id of a new order and checks if it matches any existing
+orders, using 'compareOrders()' to do this comparison. It then updates the each
+client's shares and balance.
+Pre Conditions:
+    initialize must have been run at least once.
+Parameters:
+    order_id: the id of an order to be checked against the rest
+Returns:
+    0 or 1: regular and failed exit case
+*/
+int processOrders(unsigned int order_id) {
+    int i;
+    for (i = 0; i < 500; i++) {
+        if (compareOrders(ORDERS[i], ORDERS[order_id - 1]) == 0){
+            unsigned int client_A_id = ORDERS[order_id - 1].client_id;
+            unsigned int client_B_id = ORDERS[i].client_id;
+            float bill = (0 + ORDERS[order_id - 1].type)*(ORDERS[order_id - 1].price * (float)ORDERS[order_id - 1].number) + (0 + ORDERS[i].type)*(ORDERS[i].price * (float)ORDERS[i].number);
+            printf("[DEBUG] Bill: %.2f\n", bill);
+            if (ORDERS[client_A_id - 1].type == 1){
+                CLIENTS[client_A_id - 1].balance += bill;
+                CLIENTS[client_B_id - 1].balance -= bill;
+                CLIENTS[client_A_id - 1].shares -= ORDERS[order_id - 1].number;
+                CLIENTS[client_B_id - 1].shares += ORDERS[order_id - 1].number;
+                ORDERS[order_id - 1].order_id = 0;
+                ORDERS[i].order_id = 0;
+            }
+            else if (ORDERS[client_B_id - 1].type == 1){
+                CLIENTS[client_B_id - 1].balance += bill;
+                CLIENTS[client_A_id - 1].balance -= bill;
+                CLIENTS[client_B_id - 1].shares -= ORDERS[order_id - 1].number;
+                CLIENTS[client_A_id - 1].shares += ORDERS[order_id - 1].number;
+                ORDERS[order_id - 1].order_id = 0;
+                ORDERS[i].order_id = 0;
+            }
+            return 0;
+        } 
+    }
+    return 1;
 }
 
 void printOrders(void)
@@ -138,6 +193,11 @@ void printOrders(void)
 compareOrders(order A, order B)
 Compares the two passed orders, if they are compatable it returns 0, else it
 will return 1.
+Parameters:
+    A: one order
+    B: another order
+Returns:
+    0 or 1: for match or non match respectively
 */
 int compareOrders(order A, order B)
 {
@@ -149,10 +209,4 @@ int compareOrders(order A, order B)
             return 0;
     }
     return 1;
-}
-
-void completeOrder(order A, order B)
-{
-
-    return;
 }
