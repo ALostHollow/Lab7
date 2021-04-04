@@ -88,11 +88,16 @@ void printOrders(void) {
     return;
 }
 
+/*
+compareOrders(order A, order B)
+Compares the two passed orders, if they are compatable it returns 0, else it
+will return 1.
+*/
 int compareOrders(order A, order B) {
     if ((unsigned int)A.number == (unsigned int)B.number) {
-        if (A.type == 0 && B.type == 1)
+        if (A.type == 0 && B.type == 1 && A.price >= B.price)
             return 0;
-        if (A.type == 1 && B.type == 0)
+        if (A.type == 1 && B.type == 0 && A.price <= B.price)
             return 0;
     }
     return 1;
