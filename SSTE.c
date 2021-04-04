@@ -89,11 +89,16 @@ void printOrders(void) {
 }
 
 int compareOrders(order A, order B) {
-
-    return 0;
+    if ((unsigned int)A.number == (unsigned int)B.number) {
+        if (A.type == 0 && B.type == 1)
+            return 0;
+        if (A.type == 1 && B.type == 0)
+            return 0;
+    }
+    return 1;
 }
 
 void completeOrder(order A, order B) {
-
+    
     return;
 }
