@@ -2,16 +2,18 @@
 The header file for lab 7
 */
 // STRUCTS:
-typedef struct order_{
+typedef struct order_
+{
     unsigned int number;
     float price;
     unsigned int type; // 0 for buy, 1 for sell
-    struct client_ * client;
+    struct client_ *client;
     unsigned int order_id;
 } order;
 
-typedef struct client_{
-    unsigned char * name;
+typedef struct client_
+{
+    unsigned char *name;
     unsigned int client_id;
     float balance;
     unsigned int shares;
@@ -38,7 +40,7 @@ struct order_ ORDERS[500];
 void initialize(void); // Done
 // adds ids of 0 to each element in the global arrays
 
-void addClient(unsigned char * name, float balance, unsigned int shares); // Done
+void addClient(unsigned char *name, float balance, unsigned int shares); // Done
 // adds a new client, if there are less than 100 already present.
 
 void removeClient(unsigned int client_id);
@@ -59,5 +61,5 @@ int compareOrders(order A, order B);
 // a comparision function for orders, returns a 0 if compatable or a 1 if not compatable.
 
 void completeOrder(order A, order B);
-// updates the account balance and shares of each client and removes the orders from the 
+// updates the account balance and shares of each client and removes the orders from the
 // global array of orders

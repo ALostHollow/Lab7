@@ -14,12 +14,15 @@ Parameters:
 Returns:
     none
 */
-void initialize(void){
+void initialize(void)
+{
     int i;
-    for (i = 0; i < 100; i++){
+    for (i = 0; i < 100; i++)
+    {
         CLIENTS[i].client_id = 0;
     }
-    for (i = 0; i < 500; i++){
+    for (i = 0; i < 500; i++)
+    {
         ORDERS[i].order_id = 0;
     }
 }
@@ -37,10 +40,13 @@ Parameters:
 Returns:
     none
 */
-void addClient(unsigned char * name, float balance, unsigned int shares){
+void addClient(unsigned char *name, float balance, unsigned int shares)
+{
     int i;
-    for (i = 0; i < 100; i++){
-        if (CLIENTS[i].client_id == 0){
+    for (i = 0; i < 100; i++)
+    {
+        if (CLIENTS[i].client_id == 0)
+        {
             CLIENTS[i].name = name;
             CLIENTS[i].client_id = i + 1;
             CLIENTS[i].balance = balance;
@@ -52,7 +58,8 @@ void addClient(unsigned char * name, float balance, unsigned int shares){
     return;
 }
 
-void removeClient(unsigned int client_id){
+void removeClient(unsigned int client_id)
+{
 
     return;
 }
@@ -67,33 +74,74 @@ Parameters:
 Returns:
     none
 */
-void printClients(void) {
+void printClients(void)
+{
     int i;
-    for (i = 0; i < 100; i++){
-        if (CLIENTS[i].client_id != 0) {
+    for (i = 0; i < 100; i++)
+    {
+        if (CLIENTS[i].client_id != 0)
+        {
             printf("Client: %s\n    ID: %03d\n", CLIENTS[i].name, CLIENTS[i].client_id);
             printf("    Balance: $%.2f\n    shares: %d\n", CLIENTS[i].balance, CLIENTS[i].shares);
         }
     }
     return;
 }
+//for Type: 0 buy, 1 for sell
+void placeOrder(unsigned int num, float price, unsigned int client_id, unsigned int type)
+{
+    //Making sure that the clients balance is > than the price of the stock he wants to purcase
+    //If not, we do a succesful exist.
+    int total_stock_amount = num * price;
+    if (CLIENTS[client_id].balance < total_stock_amount)
+    {
+        printf("Insufficent Funds!\n");
+        return 0;
+    }
 
-void placeOrder(unsigned int num, float price, unsigned int client_id, unsigned int type){
+    for (int i = 0; i < 500; i++)
+    {
+        //So here, type 0 means we are buying a stock and we are making sure the id == 0 so there is a spot to be used.
+        if (ORDERS[i].order_id == 0 && type == 0)
+        {
+            //I feel like this isn't correct as we'd have to associate it to the CLIENT ID as well but will ask members in group
+            //Not sure how to store client_ID
+            ORDERS[i].client->client_id = client_id;
+            ORDERS[i].number = num;
+            ORDERS[i].price = price;
+            ORDERS[i].type = 0;
+            //Have to set order_id to something
+            return 0;
+        }
+        //So here, we are selling the stock, only thing that need sto change is the type.
+        //Once we have found a spot, we simply exit the program.
+
+        else
+        {
+            ORDERS[i].client->client_id = client_id;
+            ORDERS[i].number = num;
+            ORDERS[i].price = price;
+            ORDERS[i].type = 1;
+            //Have to set order_id to something
+            return 0;
+        }
+    }
+}
+
+void printOrders(void)
+{
 
     return;
 }
 
-void printOrders(void) {
-
-    return;
-}
-
-int compareOrders(order A, order B) {
+int compareOrders(order A, order B)
+{
 
     return 0;
 }
 
-void completeOrder(order A, order B) {
+void completeOrder(order A, order B)
+{
 
     return;
 }
