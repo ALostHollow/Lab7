@@ -61,6 +61,18 @@ void addClient(unsigned char *name, float balance, unsigned int shares)
 void removeClient(unsigned int client_id)
 {
 
+    if (CLIENTS[client_id].client_id == client_id)
+    {
+        CLIENTS[client_id].client_id = 0;
+        CLIENTS[client_id].name = " ";
+        CLIENTS[client_id].balance = 0;
+        CLIENTS[client_id].client_id = 0;
+        CLIENTS[client_id].shares = 0;
+        printf("client removed\n");
+        return;
+    }
+
+    printf("Client not found!\n");
     return;
 }
 
@@ -123,14 +135,22 @@ void placeOrder(unsigned int num, float price, unsigned int client_id, unsigned 
             ORDERS[i].price = price;
             ORDERS[i].type = 1;
             //Have to set order_id to something
-            return 0;
+            ORDERS[i].client->name = "Gouled";
         }
     }
 }
 
 void printOrders(void)
 {
-
+    ;
+    for (int i = 0; i < 100; i++)
+    {
+        if (ORDERS[i].order_id != 0)
+        {
+            printf("Client: %s\n    ID: %03d\n", ORDERS->client->name, ORDERS[i].order_id);
+            printf("    Price per share: $%.2f\n    shares: %d\n", ORDERS[i].price, ORDERS[i].number);
+        }
+    }
     return;
 }
 
