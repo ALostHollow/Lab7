@@ -40,7 +40,7 @@ Parameters:
 Returns:
     none
 */
-void addClient(unsigned char *name, float balance, unsigned int shares)
+unsigned int addClient(unsigned char *name, float balance, unsigned int shares)
 {
     int i;
     for (i = 0; i < 100; i++)
@@ -52,10 +52,10 @@ void addClient(unsigned char *name, float balance, unsigned int shares)
             CLIENTS[i].balance = balance;
             CLIENTS[i].shares = shares;
             printf("client added\n");
-            return;
+            return i + 1;
         }
     }
-    return;
+    return 0;
 }
 
 void removeClient(unsigned int client_id)
@@ -99,45 +99,112 @@ void printClients(void)
     }
     return;
 }
-//for Type: 0 buy, 1 for sell
-void placeOrder(unsigned int num, float price, unsigned int client_id, unsigned int type)
+/*
+placeOrder(num, price, client_id, type)
+This function takes a number of shares, the id of the client who is placing the
+order, and the type of order (0 - buy, 1 - sell). It will call 'processOrders()'
+to process any new matching orders, after adding the new order.
+Pre Conditions:
+    initialize must have been run at least once.
+Post Conditions:
+    the new order was placed, and porcessed if a matching order existed.
+Parameters:
+    num: the number of shares to be sold/bought
+    price: the price per share
+    client_id: the id of an order to be checked against the rest
+    type: 0 or 1 for buy or sell
+Returns:
+    0 or 1: regular and failed exit case
+*/
+int placeOrder(unsigned int num, float price, unsigned int client_id, unsigned int type)
 {
     //Making sure that the clients balance is > than the price of the stock he wants to purcase
     //If not, we do a succesful exist.
-    int total_stock_amount = num * price;
-    if (CLIENTS[client_id].balance < total_stock_amount)
+    float total_stock_amount = (float)num * price;
+    int i;
+    printf("[DEBUG] Total Price: %.2f\n", total_stock_amount);
+    if (type == 0 && total_stock_amount <= CLIENTS[client_id - 1].balance)
     {
-        printf("Insufficent Funds!\n");
-        return 0;
-    }
-
-    for (int i = 0; i < 500; i++)
-    {
-        //So here, type 0 means we are buying a stock and we are making sure the id == 0 so there is a spot to be used.
-        if (ORDERS[i].order_id == 0 && type == 0)
+        for (i = 0; i < 500; i++)
         {
-            //I feel like this isn't correct as we'd have to associate it to the CLIENT ID as well but will ask members in group
-            //Not sure how to store client_ID
-            ORDERS[i].client->client_id = client_id;
-            ORDERS[i].number = num;
-            ORDERS[i].price = price;
-            ORDERS[i].type = 0;
-            //Have to set order_id to something
+            if (ORDERS[i].order_id == 0)
+            {
+                ORDERS[i].client_id = client_id;
+                ORDERS[i].number = num;
+                ORDERS[i].price = price;
+                ORDERS[i].type = 0;
+                ORDERS[i].order_id = i + 1;
+                return processOrders(i + 1);
+            }
+        }
+    }
+    else if (type == 1 && num <= CLIENTS[client_id - 1].shares)
+    {
+        for (i = 0; i < 500; i++)
+        {
+            if (ORDERS[i].order_id == 0)
+            {
+                ORDERS[i].client_id = client_id;
+                ORDERS[i].number = num;
+                ORDERS[i].price = price;
+                ORDERS[i].type = 1;
+                ORDERS[i].order_id = i + 1;
+                return processOrders(i + 1);
+            }
+        }
+    }
+    else
+    {
+        printf("[DEBUG] failed to place order\n");
+        return 1;
+    }
+}
+
+/*
+processOrders(order_id)
+This function takes the id of a new order and checks if it matches any existing
+orders, using 'compareOrders()' to do this comparison. It then updates the each
+client's shares and balance.
+Pre Conditions:
+    initialize must have been run at least once.
+Parameters:
+    order_id: the id of an order to be checked against the rest
+Returns:
+    0 or 1: regular and failed exit case
+*/
+int processOrders(unsigned int order_id)
+{
+    int i;
+    for (i = 0; i < 500; i++)
+    {
+        if (compareOrders(ORDERS[i], ORDERS[order_id - 1]) == 0)
+        {
+            unsigned int client_A_id = ORDERS[order_id - 1].client_id;
+            unsigned int client_B_id = ORDERS[i].client_id;
+            float bill = (0 + ORDERS[order_id - 1].type) * (ORDERS[order_id - 1].price * (float)ORDERS[order_id - 1].number) + (0 + ORDERS[i].type) * (ORDERS[i].price * (float)ORDERS[i].number);
+            printf("[DEBUG] Bill: %.2f\n", bill);
+            if (ORDERS[client_A_id - 1].type == 1)
+            {
+                CLIENTS[client_A_id - 1].balance += bill;
+                CLIENTS[client_B_id - 1].balance -= bill;
+                CLIENTS[client_A_id - 1].shares -= ORDERS[order_id - 1].number;
+                CLIENTS[client_B_id - 1].shares += ORDERS[order_id - 1].number;
+                ORDERS[order_id - 1].order_id = 0;
+                ORDERS[i].order_id = 0;
+            }
+            else if (ORDERS[client_B_id - 1].type == 1)
+            {
+                CLIENTS[client_B_id - 1].balance += bill;
+                CLIENTS[client_A_id - 1].balance -= bill;
+                CLIENTS[client_B_id - 1].shares -= ORDERS[order_id - 1].number;
+                CLIENTS[client_A_id - 1].shares += ORDERS[order_id - 1].number;
+                ORDERS[order_id - 1].order_id = 0;
+                ORDERS[i].order_id = 0;
+            }
             return 0;
         }
-        //So here, we are selling the stock, only thing that need sto change is the type.
-        //Once we have found a spot, we simply exit the program.
-
-        else
-        {
-            ORDERS[i].client->client_id = client_id;
-            ORDERS[i].number = num;
-            ORDERS[i].price = price;
-            ORDERS[i].type = 1;
-            //Have to set order_id to something
-            ORDERS[i].client->name = "Gouled";
-        }
     }
+    return 1;
 }
 
 void printOrders(void)
@@ -154,10 +221,133 @@ void printOrders(void)
     return;
 }
 
+void addRemoveHelper(client_ dummyArray[100])
+{
+    int userArg;
+    printf(" If you would like to add a client: Please Enter 1 \n");
+    printf(" if you would like to remove a client: Please Enter 2 \n ");
+    scanf("%d", &userArg);
+
+    if (userArg == 1)
+    {
+        unsigned char *name;
+        float balance = 0;
+        unsigned int shares = 0;
+        printf("Enter the clients name? \n");
+        scanf("%hhu", &name);
+        addClient(name, balance, shares);
+    }
+    else if (userArg == 2)
+    {
+    }
+    else
+    {
+        unsigned int client_id;
+        printf("Enter the Client you would like to remove ");
+        scanf("%u", client_id);
+        removeClient(client_id);
+    }
+}
+
+void placeOrderHelper()
+{
+    unsigned int num;
+    float price;
+    unsigned int client_id;
+    unsigned int type;
+
+    printf("Enter how many shares you would like to buy or sell \n");
+    scanf("%u", &num);
+    printf("Enter the price of the order \n");
+    scanf("%f", &price);
+    printf("Enter your client ID \n");
+    scanf("%u", client_id);
+    printf("Enter the type of order, Enter 1 for buy, Enter 2 for Sell \n");
+    scanf("%u", type);
+    placeOrder(num, price, client_id, type);
+}
+
+void viewOrderHelper()
+{
+}
+
+void ClientGUI(client_ dummyArramy[100])
+{
+    int userArg;
+
+    printf("If you would like to view all clients: Enter 1 \n");
+    printf("If you would like to view details about a specific account: Enter 2 \n");
+    scanf("%d", userArg);
+
+    if (userArg == 1)
+    {
+        printClients();
+    }
+    else if (userArg == 2)
+    {
+        int loginDetails; // Variable to get Clients login ID
+        int currentUser;  // Using the index of the char array like the pointer to the user. Maybe there's a better way to do this IDK
+        Printf(" Please enter your Client ID \n");
+        scanf("%d", &loginDetails);
+
+        for (int i = 0; i < 100 < i++)
+        {
+            if (dummyArray[0].client_id == loginDetails)
+            {
+                currentUser = i;
+                break;
+            }
+        }
+        printf("Name: %s \n", dummyArramy[currentUser].name);
+        printf("Client id: %u", dummyArramy[currentUser].client_id);
+        printf(" Balance: %f", dummyArramy[currentUser].balance);
+        printf("Shares: %u ", dummyArramy[currentUser].shares);
+    }
+}
+
+void UI(client_ dummyArray[100])
+{
+    //client_ DummyArray[100]; // Placeholder array for the array of clients
+    printf(" Welcome to the SSTE! \n");
+    printf(" \n");
+
+    int userSelection;
+
+    printf(" Please Enter a number from the following options \n");
+
+    printf("If you would like to add or remove a client:  Enter 1 \n");
+    printf("If you Would like to view your account balance and details: Enter 2 \n");
+    printf("If you would like to place an order to buy or sell securities: Enter 3 \n");
+    printf("If you would like to check the status of orders on the exchange: Enter 4 \n");
+    scanf(" %d", &userSelection);
+
+    if (userSelection == 1)
+    {
+        addRemoveHelper();
+    }
+
+    else if (userSelection == 2)
+    {
+    }
+    else if (userSelection == 3)
+    {
+        placeOrderHelper();
+    }
+    else if (userSelection == 4)
+    {
+        printOrders
+    }
+}
+
 /*
 compareOrders(order A, order B)
 Compares the two passed orders, if they are compatable it returns 0, else it
 will return 1.
+Parameters:
+    A: one order
+    B: another order
+Returns:
+    0 or 1: for match or non match respectively
 */
 int compareOrders(order A, order B)
 {
@@ -169,10 +359,4 @@ int compareOrders(order A, order B)
             return 0;
     }
     return 1;
-}
-
-void completeOrder(order A, order B)
-{
-
-    return;
-}
+ }
