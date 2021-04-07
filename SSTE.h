@@ -62,4 +62,4 @@ int compareOrders(order A, order B); // Done
 // a comparision function for orders, returns a 0 if compatable or a 1 if not compatable.
 
 int processOrders(unsigned int order_id); // Done
-// takes an order'is id and compares it against all other orders, processing them if they match
+                                          // takes an order'is id and compares it against all other orders, processing them if they match

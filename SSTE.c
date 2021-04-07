@@ -8,7 +8,7 @@ to mark empty or removed clients.
 Pre Condition:
     nothing
 Post Condition:
-    Global arrays are initialized, and other functions can be used.
+    Global arrays are in  itialized, and other functions can be used.
 Parameters:
     none
 Returns:
@@ -359,4 +359,4 @@ int compareOrders(order A, order B)
             return 0;
     }
     return 1;
- }
+}
