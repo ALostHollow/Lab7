@@ -26,16 +26,18 @@ balance, shares, and id. Implemented by Rowan
 
 placeOrder - pass a number of shares, the price, the id of the client the order is for, and the
 order type, either 0 or 1 for buy or sell respectively, and this will add the order to the
-global order array at the first 'empty' index. Validate the order before placing it.
+global order array at the first 'empty' index. Validate the order before placing it. Implemented
+by Rowan
 
 printOrders - iterates through the global order array and print each order, including the
 client id, price, type, and amount of shares.
 
 compareOrders - pass two orders, it will return a 0 if they are a match, fit for processing, or
-a 0 if they dont match, the prices or share counts dont work.
+a 0 if they dont match, the prices or share counts dont work. Implemented by Rowan.
 
-completeOrder - pass two orders, assumed that they match, and it will update the two client's
-account balance, share count, and remove the two orders from the global order array.
+processOrder - pass two orders, assumed that they match, and it will update the two client's
+account balance, share count, and remove the two orders from the global order array. Implemented
+by Rowan.
 
 
 UI module: Planning done by ...
