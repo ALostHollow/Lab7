@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
 #include "SSTE.h"
 
 /*
@@ -60,18 +62,16 @@ unsigned int addClient(unsigned char *name, float balance, unsigned int shares)
 
 void removeClient(unsigned int client_id)
 {
-
-    if (CLIENTS[client_id].client_id == client_id)
+    if (CLIENTS[client_id - 1].client_id == client_id)
     {
-        CLIENTS[client_id].client_id = 0;
-        CLIENTS[client_id].name = " ";
-        CLIENTS[client_id].balance = 0;
-        CLIENTS[client_id].client_id = 0;
-        CLIENTS[client_id].shares = 0;
+        CLIENTS[client_id - 1].client_id = 0;
+        CLIENTS[client_id - 1].name = " ";
+        CLIENTS[client_id - 1].balance = 0;
+        CLIENTS[client_id - 1].client_id = 0;
+        CLIENTS[client_id - 1].shares = 0;
         printf("client removed\n");
         return;
     }
-
     printf("Client not found!\n");
     return;
 }
@@ -122,7 +122,6 @@ int placeOrder(unsigned int num, float price, unsigned int client_id, unsigned i
     //If not, we do a succesful exist.
     float total_stock_amount = (float)num * price;
     int i;
-    printf("[DEBUG] Total Price: %.2f\n", total_stock_amount);
     if (type == 0 && total_stock_amount <= CLIENTS[client_id - 1].balance)
     {
         for (i = 0; i < 500; i++)
@@ -182,7 +181,6 @@ int processOrders(unsigned int order_id)
             unsigned int client_A_id = ORDERS[order_id - 1].client_id;
             unsigned int client_B_id = ORDERS[i].client_id;
             float bill = (0 + ORDERS[order_id - 1].type) * (ORDERS[order_id - 1].price * (float)ORDERS[order_id - 1].number) + (0 + ORDERS[i].type) * (ORDERS[i].price * (float)ORDERS[i].number);
-            printf("[DEBUG] Bill: %.2f\n", bill);
             if (ORDERS[client_A_id - 1].type == 1)
             {
                 CLIENTS[client_A_id - 1].balance += bill;
@@ -207,21 +205,35 @@ int processOrders(unsigned int order_id)
     return 1;
 }
 
+/*
+printOrders(void)
+This function takes no paramaters and returns nothing and iterates through the 
+global array of orders and prints each order with an id not equal to 0.
+Pre Condition:
+    initialize() must have been called once before hand.
+Parameters:
+    none
+Returns:
+    none 
+*/
 void printOrders(void)
 {
-    ;
-    for (int i = 0; i < 100; i++)
+    int i;
+    printf("Current Orders:\n");
+    for (i = 0; i < 100; i++)
     {
         if (ORDERS[i].order_id != 0)
         {
-            printf("Client: %s\n    ID: %03d\n", ORDERS->client->name, ORDERS[i].order_id);
-            printf("    Price per share: $%.2f\n    shares: %d\n", ORDERS[i].price, ORDERS[i].number);
+            printf("\nOrder ID: %03d \nClient Name: %s\n", ORDERS[i].order_id, CLIENTS[ORDERS[i].client_id - 1].name);
+            if (ORDERS[i].type) printf("Buying: ");
+            else printf(" Selling: ");
+            printf("%d at $%.2f\n", ORDERS[i].number, ORDERS[i].price);
         }
     }
     return;
 }
 
-void addRemoveHelper(client_ dummyArray[100])
+void addRemoveHelper()
 {
     int userArg;
     printf(" If you would like to add a client: Please Enter 1 \n");
@@ -271,7 +283,7 @@ void viewOrderHelper()
 {
 }
 
-void ClientGUI(client_ dummyArramy[100])
+void ClientGUI()
 {
     int userArg;
 
@@ -287,29 +299,75 @@ void ClientGUI(client_ dummyArramy[100])
     {
         int loginDetails; // Variable to get Clients login ID
         int currentUser;  // Using the index of the char array like the pointer to the user. Maybe there's a better way to do this IDK
-        Printf(" Please enter your Client ID \n");
+        printf(" Please enter your Client ID \n");
         scanf("%d", &loginDetails);
 
-        for (int i = 0; i < 100 < i++)
+        for (int i = 0; i < 100; i++)
         {
-            if (dummyArray[0].client_id == loginDetails)
+            if (CLIENTS[0].client_id == loginDetails)
             {
                 currentUser = i;
                 break;
             }
         }
-        printf("Name: %s \n", dummyArramy[currentUser].name);
-        printf("Client id: %u", dummyArramy[currentUser].client_id);
-        printf(" Balance: %f", dummyArramy[currentUser].balance);
-        printf("Shares: %u ", dummyArramy[currentUser].shares);
+        printf("Name: %s \n", CLIENTS[currentUser].name);
+        printf("Client id: %u", CLIENTS[currentUser].client_id);
+        printf(" Balance: %f", CLIENTS[currentUser].balance);
+        printf("Shares: %u ", CLIENTS[currentUser].shares);
     }
 }
 
-void UI(client_ dummyArray[100])
-{
-    //client_ DummyArray[100]; // Placeholder array for the array of clients
+void UI(){
     printf(" Welcome to the SSTE! \n");
     printf(" \n");
+    int userSelection;
+    char name[30];
+    int shares;
+    float balance;
+    while (1) {
+        printf("1) Add a client\n2) Remove a client\n3) Print clients\n");
+        printf("4) Place an order\n5) Print orders\n6) quit\n");
+        printf("Enter a number (1 - 6): ");
+        userSelection = getInputNum(1, 6);
+
+        switch (userSelection)
+        {
+        case 1: // done
+            // add client
+            printf("Enter client name (max 30): ");
+            scanf("%s", name);
+            printf("Enter the amount of shares: ");
+            shares = getInputNum(0, 10000);
+            printf("Enter the account balance: ");
+            balance = getInputFloat(0.0, 1000000.00);
+            addClient(name, balance, shares);
+            break;
+        case 2:
+            // remove client
+            break;
+        case 3: // done
+            // print clients
+            printClients();
+            break;
+        case 4:
+            // place order
+            break;
+        case 5: // done
+            // print orders
+            printOrders();
+            break;
+        default: // done
+            // quit
+            exit(0);
+        }
+    }
+    return;
+}
+
+void UI_old()
+{
+    //client_ DummyArray[100]; // Placeholder array for the array of clients
+    
 
     int userSelection;
 
@@ -335,7 +393,7 @@ void UI(client_ dummyArray[100])
     }
     else if (userSelection == 4)
     {
-        printOrders
+        printOrders();
     }
 }
 
@@ -359,4 +417,54 @@ int compareOrders(order A, order B)
             return 0;
     }
     return 1;
+}
+
+/*
+getInputNum(lower, upper)
+This function takes a 'lower' bound and an 'upper' bound, inclusive, and will
+ask for input until the given input meets the bound requirements and is a num.
+Paramaters:
+    lower: inputs less than this will be ignored
+    upper: inputs above this will be ignored
+Returns:
+    num: the first input that fits within the bounds
+*/
+int getInputNum(int lower, int upper){
+    int num = upper + 1;
+    char term = '0';
+    while (num > upper || num < lower){
+      if (scanf("%d", &num) == 0) {
+        do {
+          term = getchar();
+        }
+        while (!isdigit(term));
+        ungetc(term, stdin);
+      }
+    }
+  return num;
+}
+
+/*
+getInputFloat(lower, upper)
+This function takes a 'lower' bound and an 'upper' bound, inclusive, and will
+ask for input until the given input meets the bound requirements and is a num.
+Paramaters:
+    lower: inputs less than this will be ignored
+    upper: inputs above this will be ignored
+Returns:
+    num: the first input that fits within the bounds
+*/
+float getInputFloat(float lower, float upper){
+    float num = upper + 1;
+    char term = '0';
+    while (num > upper || num < lower){
+      if (scanf("%f", &num) == 0) {
+        do {
+          term = getchar();
+        }
+        while (!isdigit(term));
+        ungetc(term, stdin);
+      }
+    }
+  return num;
 }
