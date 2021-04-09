@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include "SSTE.h"
+#include <string.h>
 
 /*
 initialize(void)
@@ -61,13 +62,16 @@ unsigned int addClient(unsigned char *name, float balance, unsigned int shares)
     }
     return 0;
 }
-
+//Parameters: Takes the client ID that the user wishes to remove
 void removeClient(unsigned int client_id)
 {
+    //We first check to make sure that the client id entered in the indexed struct, is ==  to the inpu
+    //If it is, we set the id to 0.
     if (CLIENTS[client_id - 1].client_id == client_id)
     {
         CLIENTS[client_id - 1].client_id = 0;
-
+        //Here, we use strcpy because we aren't permitted to set it equal to "".
+        //Afterwards we reset the rest of the parameters back to 0
         strcpy(CLIENTS[client_id - 1].name, (unsigned char *)" ");
         //CLIENTS[client_id - 1].name = (unsigned char *)" ";
         CLIENTS[client_id - 1].balance = 0;
@@ -75,6 +79,7 @@ void removeClient(unsigned int client_id)
         CLIENTS[client_id - 1].shares = 0;
         printf("client removed\n");
 
+        //Once we set all the values related to the struct of the client, we then find the order_id and set it to 0
         for (int i = 0; i < 500; i++)
         {
             if (ORDERS[i].client_id == client_id)
@@ -248,11 +253,16 @@ void printOrders(void)
 
 void UI()
 {
+    //This is the UI, we implement a while loop with a switch case.
+    //This makes the most sense because Once we are done with a certain case, we simply
+    //Break out of it, and afterwards we are still in the while loop untill we quit, in which we do a succesful exit
     printf(" Welcome to the SSTE! \n");
     printf(" \n");
 
     while (1)
     {
+        //WE declare our functions here because you arent allowed to do so in switch cases
+
         int userSelection;
         unsigned char name[30];
         int shares;
@@ -265,6 +275,8 @@ void UI()
         printf("Enter a number (1 - 6): ");
         userSelection = getInputNum(1, 6);
 
+        //First case is calling a client, For string inputs, we use "%s", however for integers
+        //Such as theGetInput, we have our own specific function that validates if it is a correct one or not
         switch (userSelection)
         {
         case 1: // done
@@ -279,17 +291,18 @@ void UI()
 
             break;
         case 2:
-            // remove client
+            //IN case 2, this is where we remove the client by simply making sure the integer input from the user is valid,
+            //and then pass that cleint_id into our removeClient and once that is done break
             printf("Enter the Client you would like to remove ");
-            scanf("%u", &client_id);
+            client_id = getInputNum(0, 100);
             removeClient(client_id);
             break;
-        case 3: // done
-            // print clients
+        case 3: // WE simply print the clients
             printClients();
             break;
         case 4:
-            // place order
+            // placing an order, we have to verify four different integers numbers using
+            //getInputNUm which verifys an integers, and getInputFloat which is a float
             printf("Enter how many shares you would like to buy or sell \n");
             shares = getInputNum(0, 10000);
             printf("Enter the price of the order \n");
