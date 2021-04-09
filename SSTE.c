@@ -70,6 +70,11 @@ void removeClient(unsigned int client_id)
         CLIENTS[client_id - 1].client_id = 0;
         CLIENTS[client_id - 1].shares = 0;
         printf("client removed\n");
+
+        for (int i = 0; i < 500; i++){
+            if (ORDERS[i].client_id == client_id)
+                ORDERS[i].order_id = 0;
+        }
         return;
     }
     printf("Client not found!\n");
