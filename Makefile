@@ -1,4 +1,4 @@
-#Group Members: Gouled, Bryson, Rowan
+#Group Members: Gouled J, Bryson, Rowan
 
 CFLAGS = -Wall -ansi -std=c99 
 

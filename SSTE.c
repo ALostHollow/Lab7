@@ -4,7 +4,7 @@
 #include "SSTE.h"
 #include <string.h>
 
-/*
+/*done
 initialize(void)
 Sets the id of each client and order in the array to 0, we'll use an id of 0
 to mark empty or removed clients.

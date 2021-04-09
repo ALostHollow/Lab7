@@ -2,7 +2,7 @@
 The header file for lab 7
 */
 // STRUCTS:
-//Final struct.h
+//Done
 typedef struct order_
 {
     unsigned int number;
