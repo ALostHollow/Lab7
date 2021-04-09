@@ -65,13 +65,14 @@ void removeClient(unsigned int client_id)
     if (CLIENTS[client_id - 1].client_id == client_id)
     {
         CLIENTS[client_id - 1].client_id = 0;
-        CLIENTS[client_id - 1].name = " ";
+        CLIENTS[client_id - 1].name = (unsigned char *)" ";
         CLIENTS[client_id - 1].balance = 0;
         CLIENTS[client_id - 1].client_id = 0;
         CLIENTS[client_id - 1].shares = 0;
         printf("client removed\n");
 
-        for (int i = 0; i < 500; i++){
+        for (int i = 0; i < 500; i++)
+        {
             if (ORDERS[i].client_id == client_id)
                 ORDERS[i].order_id = 0;
         }
@@ -162,6 +163,7 @@ int placeOrder(unsigned int num, float price, unsigned int client_id, unsigned i
         printf("[DEBUG] failed to place order\n");
         return 1;
     }
+    return 1;
 }
 
 /*
@@ -230,106 +232,29 @@ void printOrders(void)
         if (ORDERS[i].order_id != 0)
         {
             printf("\nOrder ID: %03d \nClient Name: %s\n", ORDERS[i].order_id, CLIENTS[ORDERS[i].client_id - 1].name);
-            if (ORDERS[i].type) printf("Buying: ");
-            else printf(" Selling: ");
+            if (ORDERS[i].type)
+                printf("Buying: ");
+            else
+                printf(" Selling: ");
             printf("%d at $%.2f\n", ORDERS[i].number, ORDERS[i].price);
         }
     }
     return;
 }
 
-void addRemoveHelper()
+void UI()
 {
-    int userArg;
-    printf(" If you would like to add a client: Please Enter 1 \n");
-    printf(" if you would like to remove a client: Please Enter 2 \n ");
-    scanf("%d", &userArg);
-
-    if (userArg == 1)
-    {
-        unsigned char *name;
-        float balance = 0;
-        unsigned int shares = 0;
-        printf("Enter the clients name? \n");
-        scanf("%hhu", &name);
-        addClient(name, balance, shares);
-    }
-    else if (userArg == 2)
-    {
-    }
-    else
-    {
-        unsigned int client_id;
-        printf("Enter the Client you would like to remove ");
-        scanf("%u", client_id);
-        removeClient(client_id);
-    }
-}
-
-void placeOrderHelper()
-{
-    unsigned int num;
-    float price;
-    unsigned int client_id;
-    unsigned int type;
-
-    printf("Enter how many shares you would like to buy or sell \n");
-    scanf("%u", &num);
-    printf("Enter the price of the order \n");
-    scanf("%f", &price);
-    printf("Enter your client ID \n");
-    scanf("%u", client_id);
-    printf("Enter the type of order, Enter 1 for buy, Enter 2 for Sell \n");
-    scanf("%u", type);
-    placeOrder(num, price, client_id, type);
-}
-
-void viewOrderHelper()
-{
-}
-
-void ClientGUI()
-{
-    int userArg;
-
-    printf("If you would like to view all clients: Enter 1 \n");
-    printf("If you would like to view details about a specific account: Enter 2 \n");
-    scanf("%d", userArg);
-
-    if (userArg == 1)
-    {
-        printClients();
-    }
-    else if (userArg == 2)
-    {
-        int loginDetails; // Variable to get Clients login ID
-        int currentUser;  // Using the index of the char array like the pointer to the user. Maybe there's a better way to do this IDK
-        printf(" Please enter your Client ID \n");
-        scanf("%d", &loginDetails);
-
-        for (int i = 0; i < 100; i++)
-        {
-            if (CLIENTS[0].client_id == loginDetails)
-            {
-                currentUser = i;
-                break;
-            }
-        }
-        printf("Name: %s \n", CLIENTS[currentUser].name);
-        printf("Client id: %u", CLIENTS[currentUser].client_id);
-        printf(" Balance: %f", CLIENTS[currentUser].balance);
-        printf("Shares: %u ", CLIENTS[currentUser].shares);
-    }
-}
-
-void UI(){
     printf(" Welcome to the SSTE! \n");
     printf(" \n");
     int userSelection;
-    char name[30];
+    unsigned char name[30];
     int shares;
     float balance;
-    while (1) {
+    unsigned int client_id;
+    float price;
+    unsigned int type;
+    while (1)
+    {
         printf("1) Add a client\n2) Remove a client\n3) Print clients\n");
         printf("4) Place an order\n5) Print orders\n6) quit\n");
         printf("Enter a number (1 - 6): ");
@@ -349,6 +274,9 @@ void UI(){
             break;
         case 2:
             // remove client
+            printf("Enter the Client you would like to remove ");
+            scanf("%u", &client_id);
+            removeClient(client_id);
             break;
         case 3: // done
             // print clients
@@ -356,6 +284,15 @@ void UI(){
             break;
         case 4:
             // place order
+            printf("Enter how many shares you would like to buy or sell \n");
+            shares = getInputNum(0, 10000);
+            printf("Enter the price of the order \n");
+            scanf("%f", &price);
+            printf("Enter your client ID \n");
+            scanf("%u", &client_id);
+            printf("Enter the type of order, Enter 0 for buy, Enter 1 for Sell \n");
+            scanf("%u", &type);
+            placeOrder(shares, price, client_id, type);
             break;
         case 5: // done
             // print orders
@@ -367,39 +304,6 @@ void UI(){
         }
     }
     return;
-}
-
-void UI_old()
-{
-    //client_ DummyArray[100]; // Placeholder array for the array of clients
-    
-
-    int userSelection;
-
-    printf(" Please Enter a number from the following options \n");
-
-    printf("If you would like to add or remove a client:  Enter 1 \n");
-    printf("If you Would like to view your account balance and details: Enter 2 \n");
-    printf("If you would like to place an order to buy or sell securities: Enter 3 \n");
-    printf("If you would like to check the status of orders on the exchange: Enter 4 \n");
-    scanf(" %d", &userSelection);
-
-    if (userSelection == 1)
-    {
-        addRemoveHelper();
-    }
-
-    else if (userSelection == 2)
-    {
-    }
-    else if (userSelection == 3)
-    {
-        placeOrderHelper();
-    }
-    else if (userSelection == 4)
-    {
-        printOrders();
-    }
 }
 
 /*
@@ -434,19 +338,22 @@ Paramaters:
 Returns:
     num: the first input that fits within the bounds
 */
-int getInputNum(int lower, int upper){
+int getInputNum(int lower, int upper)
+{
     int num = upper + 1;
     char term = '0';
-    while (num > upper || num < lower){
-      if (scanf("%d", &num) == 0) {
-        do {
-          term = getchar();
+    while (num > upper || num < lower)
+    {
+        if (scanf("%d", &num) == 0)
+        {
+            do
+            {
+                term = getchar();
+            } while (!isdigit(term));
+            ungetc(term, stdin);
         }
-        while (!isdigit(term));
-        ungetc(term, stdin);
-      }
     }
-  return num;
+    return num;
 }
 
 /*
@@ -459,17 +366,26 @@ Paramaters:
 Returns:
     num: the first input that fits within the bounds
 */
-float getInputFloat(float lower, float upper){
+float getInputFloat(float lower, float upper)
+{
     float num = upper + 1;
     char term = '0';
-    while (num > upper || num < lower){
-      if (scanf("%f", &num) == 0) {
-        do {
-          term = getchar();
+    while (num > upper || num < lower)
+    {
+        if (scanf("%f", &num) == 0)
+        {
+            do
+            {
+                term = getchar();
+            } while (!isdigit(term));
+            ungetc(term, stdin);
         }
-        while (!isdigit(term));
-        ungetc(term, stdin);
-      }
     }
-  return num;
+    return num;
+}
+
+int main()
+{
+    initialize();
+    UI();
 }

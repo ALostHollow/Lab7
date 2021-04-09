@@ -14,7 +14,7 @@ typedef struct order_
 
 typedef struct client_
 {
-    unsigned char *name;
+    unsigned char name[30];
     unsigned int client_id;
     float balance;
     unsigned int shares;
