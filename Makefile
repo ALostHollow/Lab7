@@ -4,7 +4,7 @@ CFLAGS = -Wall -ansi -std=c99
 
 CC = gcc 
 
-all: SSTE  
+all: SSTE 
 
  
 SSTE: SSTE.c SSTE.h

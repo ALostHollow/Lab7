@@ -49,7 +49,8 @@ unsigned int addClient(unsigned char *name, float balance, unsigned int shares)
     {
         if (CLIENTS[i].client_id == 0)
         {
-            CLIENTS[i].name = name;
+            strcpy(CLIENTS[i].name, name);
+            //CLIENTS[i].name = name;
             CLIENTS[i].client_id = i + 1;
             CLIENTS[i].balance = balance;
             CLIENTS[i].shares = shares;
@@ -65,7 +66,9 @@ void removeClient(unsigned int client_id)
     if (CLIENTS[client_id - 1].client_id == client_id)
     {
         CLIENTS[client_id - 1].client_id = 0;
-        CLIENTS[client_id - 1].name = (unsigned char *)" ";
+
+        strcpy(CLIENTS[client_id - 1].name, (unsigned char *)" ");
+        //CLIENTS[client_id - 1].name = (unsigned char *)" ";
         CLIENTS[client_id - 1].balance = 0;
         CLIENTS[client_id - 1].client_id = 0;
         CLIENTS[client_id - 1].shares = 0;
@@ -246,15 +249,16 @@ void UI()
 {
     printf(" Welcome to the SSTE! \n");
     printf(" \n");
-    int userSelection;
-    unsigned char name[30];
-    int shares;
-    float balance;
-    unsigned int client_id;
-    float price;
-    unsigned int type;
+
     while (1)
     {
+        int userSelection;
+        unsigned char name[30];
+        int shares;
+        float balance;
+        unsigned int client_id;
+        float price;
+        unsigned int type;
         printf("1) Add a client\n2) Remove a client\n3) Print clients\n");
         printf("4) Place an order\n5) Print orders\n6) quit\n");
         printf("Enter a number (1 - 6): ");
@@ -271,6 +275,7 @@ void UI()
             printf("Enter the account balance: ");
             balance = getInputFloat(0.0, 1000000.00);
             addClient(name, balance, shares);
+
             break;
         case 2:
             // remove client
@@ -287,11 +292,11 @@ void UI()
             printf("Enter how many shares you would like to buy or sell \n");
             shares = getInputNum(0, 10000);
             printf("Enter the price of the order \n");
-            scanf("%f", &price);
+            price = getInputFloat(0.0, 10000.00);
             printf("Enter your client ID \n");
-            scanf("%u", &client_id);
+            client_id = getInputNum(0, 100);
             printf("Enter the type of order, Enter 0 for buy, Enter 1 for Sell \n");
-            scanf("%u", &type);
+            type = getInputNum(0, 1);
             placeOrder(shares, price, client_id, type);
             break;
         case 5: // done
