@@ -19,7 +19,8 @@ addClient - pass a name, account balance, and number of shares and this will upd
 'empty' index in the client array to represent the new client. Implemented by Rowan
 
 removeClient - pass a client id and it will set the id of the client to 0, marking it as 
-'empty', also remove all orders from that client from the global order array.
+'empty', also remove all orders from that client from the global order array. Implemented by
+Gouled.
 
 printClients - iterates through the global client array and prints each one along with their
 balance, shares, and id. Implemented by Rowan
@@ -30,7 +31,7 @@ global order array at the first 'empty' index. Validate the order before placing
 by Rowan
 
 printOrders - iterates through the global order array and print each order, including the
-client id, price, type, and amount of shares.
+client id, price, type, and amount of shares. Implemented by Gouled.
 
 compareOrders - pass two orders, it will return a 0 if they are a match, fit for processing, or
 a 0 if they dont match, the prices or share counts dont work. Implemented by Rowan.
@@ -40,10 +41,10 @@ account balance, share count, and remove the two orders from the global order ar
 by Rowan.
 
 
-UI module: Planning done by ...
+UI module: Planning done by Bryson
 Requirements:
 allow users to:
 	add/remove clients
-	add/remove orders
+	add orders
 	print all orders in the global array
 	print all clients in the global array
